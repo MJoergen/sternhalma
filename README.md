@@ -1,0 +1,2 @@
+# sternhalma
+Chinese Checkers AI
