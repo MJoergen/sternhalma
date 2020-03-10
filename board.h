@@ -13,7 +13,9 @@ enum EPiece
 
 class CSquare
 {
-   private:
+   public:
+      CSquare(int x, int y) : m_x(x), m_y(y) {}
+
       int m_x;
       int m_y;
 }; // class CSquare
@@ -32,12 +34,13 @@ private:
    static const int CX_SIZE = 19;
    static const int CY_SIZE = 19;
 
-   int m_board[CY_SIZE][CX_SIZE];
+   enum EPiece m_board[CY_SIZE][CX_SIZE];
 
 public:
    CBoard(const std::string& initString = "");
 
-   friend std::ostream& operator << (std::ostream& os, const CBoard& rhs);
+   void print(const CSquare sq = {0,0}) const;
+   CSquare getSquare() const;
 
 }; // class CBoard
 

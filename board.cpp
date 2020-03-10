@@ -1,5 +1,6 @@
 #include <string.h>
 #include <assert.h>
+#include <ncurses.h>
 #include "board.h"
 
 CBoard::CBoard(const std::string& initString)
@@ -49,29 +50,55 @@ CBoard::CBoard(const std::string& initString)
 
 } // CBoard
 
-std::ostream& operator << (std::ostream& os, const CBoard& rhs)
+static char enumToChar(const enum EPiece& en)
+{
+   switch (en)
+   {
+      case P_X :       return 'X';
+      case P_O :       return 'O';
+      case P_space :   return '.';
+      case P_invalid : return ' ';
+   }
+   return '?';
+}; // static char enumToChar()
+
+void CBoard::print(const CSquare sq) const
 {
    for (int y=0; y<CBoard::CY_SIZE; ++y)
    {
-      for (int x=y; x<CBoard::CY_SIZE; ++x)
-      {
-         os << " ";
-      }
-
+      move(y, y);
       for (int x=0; x<CBoard::CX_SIZE; ++x)
       {
-         switch (rhs.m_board[y][x])
+         if (sq.m_x==x && sq.m_y==y)
          {
-            case P_X :       os << "X "; break;
-            case P_O :       os << "O "; break;
-            case P_space :   os << ". "; break;
-            case P_invalid : os << "  "; break;
+            attron(A_REVERSE);
+         }
+         mvaddch(y, 2*x-y+5, enumToChar(m_board[y][x]));
+         if (sq.m_x==x && sq.m_y==y)
+         {
+            attroff(A_REVERSE);
          }
       }
-
-      os << std::endl;
    }
+} // void CBoard::print()
 
-   return os;
-} // std::ostream& operator <<
+CSquare CBoard::getSquare() const
+{
+   CSquare sq(10, 14);
+
+   while (true)
+   {
+      print(sq);
+
+      int ch = getch();
+      switch (ch)
+      {
+         case KEY_DOWN  : sq.m_y += 1; break;
+         case KEY_UP    : sq.m_y -= 1; break;
+         case KEY_RIGHT : sq.m_x += 1; break;
+         case KEY_LEFT  : sq.m_x -= 1; break;
+         default        : return sq;
+      }
+   }
+} // CSquare CBoard::getSquare() const
 
