@@ -11,6 +11,21 @@ enum EPiece
 }; // enum EPiece
 
 
+class CSquare
+{
+   private:
+      int m_x;
+      int m_y;
+}; // class CSquare
+
+class CMove
+{
+   private:
+      CSquare m_from;
+      CSquare m_to;
+}; // class CMove
+
+
 class CBoard
 {
 private:
