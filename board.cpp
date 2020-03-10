@@ -86,14 +86,16 @@ void CBoard::print() const
          if (sq == m_move.m_to)   attroff(A_BLINK);
       }
    }
-   mvprintw(20, 20, "%d.%d , %d.%d       ", m_move.m_from.m_x, m_move.m_from.m_y, m_move.m_to.m_x, m_move.m_to.m_y);
+   std::vector<CMove> legalMoves = getLegalMoves();
+   mvprintw(20, 20, "%d legal moves   ", legalMoves.size());
 } // void CBoard::print()
 
 void CBoard::getMove(CMove& move) const
 {
-   move = {{10, 14}, {10, 14}};
    ((CBoard *)this)->setFrom({-1, -1});
+   ((CBoard *)this)->setTo({-1, -1});
 
+   move = {{10, 14}, {10, 14}};
    // Get FROM square
    while (true)
    {
@@ -101,11 +103,9 @@ void CBoard::getMove(CMove& move) const
       if (m_board[move.m_from.m_y][move.m_from.m_x] == P_X)
          break;
    }
-
    ((CBoard *)this)->setFrom(move.m_from);
 
    move.m_to = move.m_from;
-
    // Get TO square
    while (true)
    {
@@ -147,4 +147,84 @@ void CBoard::makeMove(CMove& move)
    m_board[move.m_from.m_y][move.m_from.m_x] = P_space;
 } // void CBoard::makeMove(CMove& move)
 
+std::vector<CMove> CBoard::getLegalMoves() const
+{
+   std::vector<CMove> legalMoves;
+
+   CMove move;
+   for (int y=0; y<CBoard::CY_SIZE; ++y)
+   {
+      for (int x=0; x<CBoard::CX_SIZE; ++x)
+      {
+         if (m_board[y][x] == P_X)
+         {
+            move.m_from=CSquare(x, y);
+
+            if (m_board[y][x+1] == P_space)
+            {
+               move.m_to=CSquare(x+1, y);
+               legalMoves.push_back(move);
+            }
+            if (m_board[y][x-1] == P_space)
+            {
+               move.m_to=CSquare(x-1, y);
+               legalMoves.push_back(move);
+            }
+            if (m_board[y+1][x] == P_space)
+            {
+               move.m_to=CSquare(x, y+1);
+               legalMoves.push_back(move);
+            }
+            if (m_board[y+1][x+1] == P_space)
+            {
+               move.m_to=CSquare(x+1, y+1);
+               legalMoves.push_back(move);
+            }
+            if (m_board[y-1][x] == P_space)
+            {
+               move.m_to=CSquare(x, y-1);
+               legalMoves.push_back(move);
+            }
+            if (m_board[y-1][x-1] == P_space)
+            {
+               move.m_to=CSquare(x-1, y-1);
+               legalMoves.push_back(move);
+            }
+
+            if ((m_board[y][x+1] == P_X || m_board[y][x+1] == P_O) && m_board[y][x+2] == P_space)
+            {
+               move.m_to=CSquare(x+2, y);
+               legalMoves.push_back(move);
+            }
+            if ((m_board[y][x-1] == P_X || m_board[y][x-1] == P_O) && m_board[y][x-2] == P_space)
+            {
+               move.m_to=CSquare(x-2, y);
+               legalMoves.push_back(move);
+            }
+            if ((m_board[y+1][x] == P_X || m_board[y+1][x] == P_O) && m_board[y+2][x] == P_space)
+            {
+               move.m_to=CSquare(x, y+2);
+               legalMoves.push_back(move);
+            }
+            if ((m_board[y+1][x+1] == P_X || m_board[y+1][x+1] == P_O) && m_board[y+2][x+2] == P_space)
+            {
+               move.m_to=CSquare(x+2, y+2);
+               legalMoves.push_back(move);
+            }
+            if ((m_board[y-1][x] == P_X || m_board[y-1][x] == P_O) && m_board[y-2][x] == P_space)
+            {
+               move.m_to=CSquare(x, y-2);
+               legalMoves.push_back(move);
+            }
+            if ((m_board[y-1][x-1] == P_X || m_board[y-1][x-1] == P_O) && m_board[y-2][x-2] == P_space)
+            {
+               move.m_to=CSquare(x-2, y-2);
+               legalMoves.push_back(move);
+            }
+         }
+      }
+   }
+
+   return legalMoves;
+} // std::vector<CMove> getLegalMoves() const
 

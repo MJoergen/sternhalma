@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ostream>
+#include <vector>
 
 enum EPiece
 {
@@ -48,6 +49,7 @@ public:
    void getSquare(CSquare& sq) const;
    void getMove(CMove &move) const;
    void makeMove(CMove &move);
+   std::vector<CMove> getLegalMoves() const;
 
    void setFrom(const CSquare& sq) {m_move.m_from = sq;}
    void setTo(const CSquare& sq)   {m_move.m_to = sq;}
