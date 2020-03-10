@@ -10,9 +10,14 @@ int main()
    cbreak();               // Disable line buffering
    keypad(stdscr, TRUE);   // Enable keypad
    noecho();               // Disable keyboard echo
+   curs_set(0);            // Disable cursor
 
-   board.print();
-   CSquare sq = board.getSquare();
+   while (true)
+   {
+      CMove move;
+      board.getMove(move);
+      board.makeMove(move);
+   }
 
    endwin();
 

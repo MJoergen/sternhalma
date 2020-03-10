@@ -14,15 +14,18 @@ enum EPiece
 class CSquare
 {
    public:
+      CSquare() : m_x(-1), m_y(-1) {}
       CSquare(int x, int y) : m_x(x), m_y(y) {}
+      CSquare(const CSquare& rhs) : m_x(rhs.m_x), m_y(rhs.m_y) {}
 
+      bool operator == (const CSquare& rhs) const {return m_x == rhs.m_x && m_y == rhs.m_y;}
       int m_x;
       int m_y;
 }; // class CSquare
 
 class CMove
 {
-   private:
+   public:
       CSquare m_from;
       CSquare m_to;
 }; // class CMove
@@ -36,11 +39,18 @@ private:
 
    enum EPiece m_board[CY_SIZE][CX_SIZE];
 
+   CMove m_move;
+
 public:
    CBoard(const std::string& initString = "");
 
-   void print(const CSquare sq = {0,0}) const;
-   CSquare getSquare() const;
+   void print() const;
+   void getSquare(CSquare& sq) const;
+   void getMove(CMove &move) const;
+   void makeMove(CMove &move);
+
+   void setFrom(const CSquare& sq) {m_move.m_from = sq;}
+   void setTo(const CSquare& sq)   {m_move.m_to = sq;}
 
 }; // class CBoard
 

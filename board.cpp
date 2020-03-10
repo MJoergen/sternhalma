@@ -3,6 +3,31 @@
 #include <ncurses.h>
 #include "board.h"
 
+static enum EPiece charToEnum(char ch)
+{
+   switch (ch)
+   {
+      case 'X' : return P_X;
+      case 'O' : return P_O;
+      case '.' : return P_space;
+      case '#' : return P_invalid;
+   }
+   assert(false);
+}; // static char enumToChar()
+
+static char enumToChar(const enum EPiece& en)
+{
+   switch (en)
+   {
+      case P_X :       return 'X';
+      case P_O :       return 'O';
+      case P_space :   return '.';
+      case P_invalid : return ' ';
+   }
+   assert(false);
+}; // static char enumToChar()
+
+
 CBoard::CBoard(const std::string& initString)
 {
    std::string thisInitString(initString);
@@ -37,58 +62,66 @@ CBoard::CBoard(const std::string& initString)
    {
       for (int x=0; x<CX_SIZE; ++x)
       {
-         switch (thisInitString[y*CX_SIZE+x])
-         {
-            case '#' : m_board[y][x] = P_invalid; break;
-            case 'X' : m_board[y][x] = P_X; break;
-            case 'O' : m_board[y][x] = P_O; break;
-            case '.' : m_board[y][x] = P_space; break;
-            default: assert(false);
-         }
+         char ch = thisInitString[y*CX_SIZE+x];
+         m_board[y][x] = charToEnum(ch);
       }
    }
 
 } // CBoard
 
-static char enumToChar(const enum EPiece& en)
-{
-   switch (en)
-   {
-      case P_X :       return 'X';
-      case P_O :       return 'O';
-      case P_space :   return '.';
-      case P_invalid : return ' ';
-   }
-   return '?';
-}; // static char enumToChar()
-
-void CBoard::print(const CSquare sq) const
+void CBoard::print() const
 {
    for (int y=0; y<CBoard::CY_SIZE; ++y)
    {
       move(y, y);
       for (int x=0; x<CBoard::CX_SIZE; ++x)
       {
-         if (sq.m_x==x && sq.m_y==y)
-         {
-            attron(A_REVERSE);
-         }
+         CSquare sq(x,y);
+         if (sq == m_move.m_from) attron(A_REVERSE);
+         if (sq == m_move.m_to)   attron(A_REVERSE);
+         if (sq == m_move.m_to)   attron(A_BLINK);
          mvaddch(y, 2*x-y+5, enumToChar(m_board[y][x]));
-         if (sq.m_x==x && sq.m_y==y)
-         {
-            attroff(A_REVERSE);
-         }
+         if (sq == m_move.m_from) attroff(A_REVERSE);
+         if (sq == m_move.m_to)   attroff(A_REVERSE);
+         if (sq == m_move.m_to)   attroff(A_BLINK);
       }
    }
+   mvprintw(20, 20, "%d.%d , %d.%d       ", m_move.m_from.m_x, m_move.m_from.m_y, m_move.m_to.m_x, m_move.m_to.m_y);
 } // void CBoard::print()
 
-CSquare CBoard::getSquare() const
+void CBoard::getMove(CMove& move) const
 {
-   CSquare sq(10, 14);
+   move = {{10, 14}, {10, 14}};
+   ((CBoard *)this)->setFrom({-1, -1});
 
+   // Get FROM square
    while (true)
    {
-      print(sq);
+      getSquare(move.m_from);
+      if (m_board[move.m_from.m_y][move.m_from.m_x] == P_X)
+         break;
+   }
+
+   ((CBoard *)this)->setFrom(move.m_from);
+
+   move.m_to = move.m_from;
+
+   // Get TO square
+   while (true)
+   {
+      getSquare(move.m_to);
+      if (m_board[move.m_to.m_y][move.m_to.m_x] == P_space)
+         break;
+   }
+} // CMove CBoard::getMove() const
+
+void CBoard::getSquare(CSquare& sq) const
+{
+   // Get FROM square
+   while (true)
+   {
+      ((CBoard *)this)->setTo(sq);
+      print();
       CSquare oldSq(sq);
 
       int ch = getch();
@@ -98,11 +131,7 @@ CSquare CBoard::getSquare() const
          case KEY_UP    : sq.m_y -= 1; break;
          case KEY_RIGHT : sq.m_x += 1; break;
          case KEY_LEFT  : sq.m_x -= 1; break;
-         default        :
-            if (m_board[sq.m_y][sq.m_x] == P_X)
-            {
-               return sq;
-            }
+         default        : return;
       } // switch
 
       if (m_board[sq.m_y][sq.m_x] == P_invalid)
@@ -111,4 +140,11 @@ CSquare CBoard::getSquare() const
       }
    }
 } // CSquare CBoard::getSquare() const
+
+void CBoard::makeMove(CMove& move)
+{
+   m_board[move.m_to.m_y][move.m_to.m_x] = m_board[move.m_from.m_y][move.m_from.m_x];
+   m_board[move.m_from.m_y][move.m_from.m_x] = P_space;
+} // void CBoard::makeMove(CMove& move)
+
 
