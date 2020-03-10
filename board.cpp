@@ -89,6 +89,7 @@ CSquare CBoard::getSquare() const
    while (true)
    {
       print(sq);
+      CSquare oldSq(sq);
 
       int ch = getch();
       switch (ch)
@@ -97,7 +98,16 @@ CSquare CBoard::getSquare() const
          case KEY_UP    : sq.m_y -= 1; break;
          case KEY_RIGHT : sq.m_x += 1; break;
          case KEY_LEFT  : sq.m_x -= 1; break;
-         default        : return sq;
+         default        :
+            if (m_board[sq.m_y][sq.m_x] == P_X)
+            {
+               return sq;
+            }
+      } // switch
+
+      if (m_board[sq.m_y][sq.m_x] == P_invalid)
+      {
+         sq = oldSq;
       }
    }
 } // CSquare CBoard::getSquare() const
