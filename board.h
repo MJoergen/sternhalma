@@ -49,6 +49,9 @@ public:
    void getSquare(CSquare& sq) const;
    void getMove(CMove &move) const;
    void makeMove(CMove &move);
+   std::vector<CMove> getLegalMoveDestinations(const CSquare& from) const;
+   std::vector<CMove> getLegalJumpDestinations(const CSquare& from) const;
+   std::vector<CMove> getAllLegalJumpDestinations(const CSquare& from) const;
    std::vector<CMove> getLegalMoves() const;
 
    void setFrom(const CSquare& sq) {m_move.m_from = sq;}
