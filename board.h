@@ -51,10 +51,12 @@ public:
    CBoard(const std::string& initString = "");
 
    void print() const;
-   void getSquare(CSquare& sq) const;
    void getMove(CMove &move) const;
    void makeMove(CMove &move);
    bool isMoveLegal(CMove& move) const;
+
+private:
+   void getSquare(CSquare& sq) const;
    std::vector<CMove> getLegalMoveDestinations(const CSquare& from) const;
    std::vector<CSquare> getLegalJumpDestinations(const CSquare& from) const;
    void getAllLegalJumpDestinations(std::vector<CMove>& moves, const CSquare& cur, const CSquare& from) const;
