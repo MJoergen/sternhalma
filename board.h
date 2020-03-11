@@ -27,8 +27,12 @@ class CSquare
 class CMove
 {
    public:
+      CMove() {}
+      CMove(const CSquare& from, const CSquare& to) : m_from(from), m_to(to) {}
       CSquare m_from;
       CSquare m_to;
+
+      bool operator == (const CMove& rhs) const {return m_from == rhs.m_from && m_to == rhs.m_to;}
 }; // class CMove
 
 
@@ -49,9 +53,10 @@ public:
    void getSquare(CSquare& sq) const;
    void getMove(CMove &move) const;
    void makeMove(CMove &move);
+   bool isMoveLegal(CMove& move) const;
    std::vector<CMove> getLegalMoveDestinations(const CSquare& from) const;
-   std::vector<CMove> getLegalJumpDestinations(const CSquare& from) const;
-   std::vector<CMove> getAllLegalJumpDestinations(const CSquare& from) const;
+   std::vector<CSquare> getLegalJumpDestinations(const CSquare& from) const;
+   void getAllLegalJumpDestinations(std::vector<CMove>& moves, const CSquare& cur, const CSquare& from) const;
    std::vector<CMove> getLegalMoves() const;
 
    void setFrom(const CSquare& sq) {m_move.m_from = sq;}

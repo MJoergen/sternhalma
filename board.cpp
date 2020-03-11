@@ -3,6 +3,17 @@
 #include <ncurses.h>
 #include "board.h"
 
+static bool isMoveInList(const std::vector<CMove>& moves, const CMove& newMove)
+{
+   for (auto move : moves)
+   {
+      if (move == newMove)
+         return true;
+   }
+
+   return false;
+} // static bool isMoveInList(const std::vector<CMove>& moves, const CMove& newMove)
+
 static enum EPiece charToEnum(char ch)
 {
    switch (ch)
@@ -90,6 +101,13 @@ void CBoard::print() const
    mvprintw(20, 20, "%d legal moves   ", legalMoves.size());
 } // void CBoard::print()
 
+bool CBoard::isMoveLegal(CMove& move) const
+{
+   std::vector<CMove> legalMoves = getLegalMoves();
+   return isMoveInList(legalMoves, move);
+} // bool CBoard::isMoveLegal(CMove& move) const
+
+
 void CBoard::getMove(CMove& move) const
 {
    ((CBoard *)this)->setFrom({-1, -1});
@@ -125,6 +143,7 @@ void CBoard::getSquare(CSquare& sq) const
       CSquare oldSq(sq);
 
       int ch = getch();
+      mvprintw(21, 20, "             ");
       switch (ch)
       {
          case KEY_DOWN  : sq.m_y += 1; break;
@@ -190,54 +209,57 @@ std::vector<CMove> CBoard::getLegalMoveDestinations(const CSquare& from) const
    return legalMoves;
 } // std::vector<CMove> CBoard::getLegalMoveDestinations(const CSquare& from) const
 
-std::vector<CMove> CBoard::getLegalJumpDestinations(const CSquare& from) const
+std::vector<CSquare> CBoard::getLegalJumpDestinations(const CSquare& from) const
 {
-   std::vector<CMove> legalMoves;
-   CMove move;
-   move.m_from=from;
+   std::vector<CSquare> legalSquares;
 
    int x = from.m_x;
    int y = from.m_y;
 
    if ((m_board[y][x+1] == P_X || m_board[y][x+1] == P_O) && m_board[y][x+2] == P_space)
    {
-      move.m_to=CSquare(x+2, y);
-      legalMoves.push_back(move);
+      legalSquares.push_back(CSquare(x+2, y));
    }
    if ((m_board[y][x-1] == P_X || m_board[y][x-1] == P_O) && m_board[y][x-2] == P_space)
    {
-      move.m_to=CSquare(x-2, y);
-      legalMoves.push_back(move);
+      legalSquares.push_back(CSquare(x-2, y));
    }
    if ((m_board[y+1][x] == P_X || m_board[y+1][x] == P_O) && m_board[y+2][x] == P_space)
    {
-      move.m_to=CSquare(x, y+2);
-      legalMoves.push_back(move);
+      legalSquares.push_back(CSquare(x, y+2));
    }
    if ((m_board[y+1][x+1] == P_X || m_board[y+1][x+1] == P_O) && m_board[y+2][x+2] == P_space)
    {
-      move.m_to=CSquare(x+2, y+2);
-      legalMoves.push_back(move);
+      legalSquares.push_back(CSquare(x+2, y+2));
    }
    if ((m_board[y-1][x] == P_X || m_board[y-1][x] == P_O) && m_board[y-2][x] == P_space)
    {
-      move.m_to=CSquare(x, y-2);
-      legalMoves.push_back(move);
+      legalSquares.push_back(CSquare(x, y-2));
    }
    if ((m_board[y-1][x-1] == P_X || m_board[y-1][x-1] == P_O) && m_board[y-2][x-2] == P_space)
    {
-      move.m_to=CSquare(x-2, y-2);
-      legalMoves.push_back(move);
+      legalSquares.push_back(CSquare(x-2, y-2));
    }
 
-   return legalMoves;
-} // std::vector<CMove> CBoard::getLegalJumpDestinations(const CSquare& from) const
+   return legalSquares;
+} // std::vector<CSquare> CBoard::getLegalJumpDestinations(const CSquare& from) const
 
 
-std::vector<CMove> CBoard::getAllLegalJumpDestinations(const CSquare& from) const
+void CBoard::getAllLegalJumpDestinations(std::vector<CMove>& moves, const CSquare& cur, const CSquare& from) const
 {
-   return getLegalJumpDestinations(from);
-} // std::vector<CMove> CBoard::getAllLegalJumpDestinations(const CSquare& from) const
+   std::vector<CSquare> newSquares = getLegalJumpDestinations(cur);
+
+   for (auto newSquare : newSquares)
+   {
+      CMove move(from, newSquare);
+      if (isMoveInList(moves, move))
+         continue;
+
+      moves.push_back(move);
+
+      getAllLegalJumpDestinations(moves, newSquare, from);
+   }
+} // void CBoard::getAllLegalJumpDestinations(std::vector<CMove>& moves, const CSquare& from) const
 
 
 std::vector<CMove> CBoard::getLegalMoves() const
@@ -255,7 +277,8 @@ std::vector<CMove> CBoard::getLegalMoves() const
             std::vector<CMove> moves = getLegalMoveDestinations(from);
             legalMoves.insert(legalMoves.end(), moves.begin(), moves.end());
 
-            moves = getAllLegalJumpDestinations(from);
+            moves.clear();
+            getAllLegalJumpDestinations(moves, from, from);
             legalMoves.insert(legalMoves.end(), moves.begin(), moves.end());
          }
       }
