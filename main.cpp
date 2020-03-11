@@ -1,6 +1,19 @@
-#include <iostream>
 #include <ncurses.h>
 #include "board.h"
+
+static CMove getPlayerMove(const CBoard& board)
+{
+   CMove move;
+   while (true)   // Loop until player enters a legal move.
+   {
+      board.getMove(move);
+      if (board.isMoveLegal(move))
+         break;
+      mvprintw(21, 20, "Illegal move.");
+   }
+   return move;
+} // static CMove getPlayerMove(const CBoard& board)
+
 
 int main()
 {
@@ -12,21 +25,14 @@ int main()
    noecho();               // Disable keyboard echo
    curs_set(0);            // Disable cursor
 
-   while (true)   // Loop over entire game
+   while (true)   // Loop until game over.
    {
-      CMove move;
-      while (true)   // Loop until player enters a legal move
-      {
-         board.getMove(move);
-         if (board.isMoveLegal(move))
-            break;
-         mvprintw(21, 20, "Illegal move.");
-      }
+      CMove move = getPlayerMove(board);
       board.makeMove(move);
    }
 
    endwin();
 
    return 0;
-}
+} // int main()
 

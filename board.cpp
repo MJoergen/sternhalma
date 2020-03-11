@@ -1,4 +1,3 @@
-#include <string.h>
 #include <assert.h>
 #include <ncurses.h>
 #include "board.h"
@@ -14,6 +13,7 @@ static bool isMoveInList(const std::vector<CMove>& moves, const CMove& newMove)
    return false;
 } // static bool isMoveInList(const std::vector<CMove>& moves, const CMove& newMove)
 
+
 static enum EPiece charToEnum(char ch)
 {
    switch (ch)
@@ -25,6 +25,7 @@ static enum EPiece charToEnum(char ch)
    }
    assert(false);
 }; // static char enumToChar()
+
 
 static char enumToChar(const enum EPiece& en)
 {
@@ -77,15 +78,23 @@ CBoard::CBoard(const std::string& initString)
          m_board[y][x] = charToEnum(ch);
       }
    }
-
 } // CBoard
+
+
+std::vector<CMove> CBoard::getLegalMovesFrom(const CSquare& from) const
+{
+   std::vector<CMove> jumps;
+   getAllLegalJumpDestinations(jumps, from, from);
+
+   std::vector<CMove> moves = getLegalMoveDestinations(from);
+   moves.insert(moves.end(), jumps.begin(), jumps.end());
+   return moves;
+} // std::vector<CMove> CBoard::getLegalMovesFrom(const CSquare& from) const
+
 
 void CBoard::print() const
 {
-
-   std::vector<CMove> jumps;
-   getAllLegalJumpDestinations(jumps, m_move.m_from, m_move.m_from);
-   std::vector<CMove> moves = getLegalMoveDestinations(m_move.m_from);
+   std::vector<CMove> moves = getLegalMovesFrom(m_move.m_from);
 
    for (int y=0; y<CBoard::CY_SIZE; ++y)
    {
@@ -94,8 +103,7 @@ void CBoard::print() const
       {
          CSquare sq(x,y);
 
-         if (isMoveInList(jumps, CMove(m_move.m_from, sq)) ||
-             isMoveInList(moves, CMove(m_move.m_from, sq)))
+         if (isMoveInList(moves, CMove(m_move.m_from, sq)))
            attron(A_BLINK);
          if (sq == m_move.m_from) attron(A_REVERSE);
          if (sq == m_move.m_to)   attron(A_REVERSE);
@@ -103,8 +111,7 @@ void CBoard::print() const
 
          mvaddch(y, 2*x-y+5, enumToChar(m_board[y][x]));
 
-         if (isMoveInList(jumps, CMove(m_move.m_from, sq)) ||
-             isMoveInList(moves, CMove(m_move.m_from, sq)))
+         if (isMoveInList(moves, CMove(m_move.m_from, sq)))
            attroff(A_BLINK);
 
          if (sq == m_move.m_from) attroff(A_REVERSE);
@@ -115,6 +122,7 @@ void CBoard::print() const
    std::vector<CMove> legalMoves = getLegalMoves();
    mvprintw(20, 20, "%d legal moves   ", legalMoves.size());
 } // void CBoard::print()
+
 
 bool CBoard::isMoveLegal(CMove& move) const
 {
@@ -129,7 +137,7 @@ void CBoard::getMove(CMove& move) const
    ((CBoard *)this)->setTo({-1, -1});
 
    move = {{10, 14}, {10, 14}};
-   // Get FROM square
+   // Get FROM square. User must select one of his own pieces.
    while (true)
    {
       getSquare(move.m_from);
@@ -140,12 +148,7 @@ void CBoard::getMove(CMove& move) const
 
    move.m_to = move.m_from;
    // Get TO square
-   while (true)
-   {
-      getSquare(move.m_to);
-      if (m_board[move.m_to.m_y][move.m_to.m_x] == P_space)
-         break;
-   }
+   getSquare(move.m_to);
 } // CMove CBoard::getMove() const
 
 void CBoard::getSquare(CSquare& sq) const

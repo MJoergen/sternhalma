@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ostream>
+#include <string>
 #include <vector>
 
 enum EPiece
@@ -23,6 +23,7 @@ class CSquare
       int m_x;
       int m_y;
 }; // class CSquare
+
 
 class CMove
 {
@@ -57,10 +58,10 @@ public:
    std::vector<CMove> getLegalMoveDestinations(const CSquare& from) const;
    std::vector<CSquare> getLegalJumpDestinations(const CSquare& from) const;
    void getAllLegalJumpDestinations(std::vector<CMove>& moves, const CSquare& cur, const CSquare& from) const;
+   std::vector<CMove> getLegalMovesFrom(const CSquare& from) const;
    std::vector<CMove> getLegalMoves() const;
 
    void setFrom(const CSquare& sq) {m_move.m_from = sq;}
    void setTo(const CSquare& sq)   {m_move.m_to = sq;}
-
 }; // class CBoard
 
