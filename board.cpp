@@ -82,16 +82,31 @@ CBoard::CBoard(const std::string& initString)
 
 void CBoard::print() const
 {
+
+   std::vector<CMove> jumps;
+   getAllLegalJumpDestinations(jumps, m_move.m_from, m_move.m_from);
+   std::vector<CMove> moves = getLegalMoveDestinations(m_move.m_from);
+
    for (int y=0; y<CBoard::CY_SIZE; ++y)
    {
       move(y, y);
       for (int x=0; x<CBoard::CX_SIZE; ++x)
       {
          CSquare sq(x,y);
+
+         if (isMoveInList(jumps, CMove(m_move.m_from, sq)) ||
+             isMoveInList(moves, CMove(m_move.m_from, sq)))
+           attron(A_BLINK);
          if (sq == m_move.m_from) attron(A_REVERSE);
          if (sq == m_move.m_to)   attron(A_REVERSE);
          if (sq == m_move.m_to)   attron(A_BLINK);
+
          mvaddch(y, 2*x-y+5, enumToChar(m_board[y][x]));
+
+         if (isMoveInList(jumps, CMove(m_move.m_from, sq)) ||
+             isMoveInList(moves, CMove(m_move.m_from, sq)))
+           attroff(A_BLINK);
+
          if (sq == m_move.m_from) attroff(A_REVERSE);
          if (sq == m_move.m_to)   attroff(A_REVERSE);
          if (sq == m_move.m_to)   attroff(A_BLINK);
