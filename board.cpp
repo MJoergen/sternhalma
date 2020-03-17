@@ -119,14 +119,14 @@ void CBoard::print() const
          if (sq == m_move.m_to)   attroff(A_BLINK);
       }
    }
-   std::vector<CMove> legalMoves = getLegalMoves();
+   std::vector<CMove> legalMoves = getLegalMoves(P_X);
    mvprintw(20, 20, "%d legal moves   ", legalMoves.size());
 } // void CBoard::print()
 
 
 bool CBoard::isMoveLegal(CMove& move) const
 {
-   std::vector<CMove> legalMoves = getLegalMoves();
+   std::vector<CMove> legalMoves = getLegalMoves(P_X);
    return isMoveInList(legalMoves, move);
 } // bool CBoard::isMoveLegal(CMove& move) const
 
@@ -280,7 +280,7 @@ void CBoard::getAllLegalJumpDestinations(std::vector<CMove>& moves, const CSquar
 } // void CBoard::getAllLegalJumpDestinations(std::vector<CMove>& moves, const CSquare& from) const
 
 
-std::vector<CMove> CBoard::getLegalMoves() const
+std::vector<CMove> CBoard::getLegalMoves(enum EPiece piece) const
 {
    std::vector<CMove> legalMoves;
 
@@ -288,7 +288,7 @@ std::vector<CMove> CBoard::getLegalMoves() const
    {
       for (int x=0; x<CBoard::CX_SIZE; ++x)
       {
-         if (m_board[y][x] == P_X)
+         if (m_board[y][x] == piece)
          {
             CSquare from=CSquare(x, y);
 
@@ -303,5 +303,5 @@ std::vector<CMove> CBoard::getLegalMoves() const
    }
 
    return legalMoves;
-} // std::vector<CMove> getLegalMoves() const
+} // std::vector<CMove> CBoard::getLegalMoves(enum EPiece piece) const
 

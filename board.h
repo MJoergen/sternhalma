@@ -34,6 +34,7 @@ class CMove
       CSquare m_to;
 
       bool operator == (const CMove& rhs) const {return m_from == rhs.m_from && m_to == rhs.m_to;}
+      bool operator < (const CMove& rhs) const {return m_to.m_y - m_from.m_y < rhs.m_to.m_y - rhs.m_from.m_y;}
 }; // class CMove
 
 
@@ -54,6 +55,7 @@ public:
    void getMove(CMove &move) const;
    void makeMove(CMove &move);
    bool isMoveLegal(CMove& move) const;
+   std::vector<CMove> getLegalMoves(enum EPiece piece) const;
 
 private:
    void getSquare(CSquare& sq) const;
@@ -61,7 +63,6 @@ private:
    std::vector<CSquare> getLegalJumpDestinations(const CSquare& from) const;
    void getAllLegalJumpDestinations(std::vector<CMove>& moves, const CSquare& cur, const CSquare& from) const;
    std::vector<CMove> getLegalMovesFrom(const CSquare& from) const;
-   std::vector<CMove> getLegalMoves() const;
 
    void setFrom(const CSquare& sq) {m_move.m_from = sq;}
    void setTo(const CSquare& sq)   {m_move.m_to = sq;}

@@ -1,5 +1,6 @@
 #include <ncurses.h>
 #include "board.h"
+#include "ai.h"
 
 static CMove getPlayerMove(const CBoard& board)
 {
@@ -19,6 +20,8 @@ int main()
 {
    CBoard board;
 
+   CAI ai(board);
+
    initscr();
    cbreak();               // Disable line buffering
    keypad(stdscr, TRUE);   // Enable keypad
@@ -28,6 +31,9 @@ int main()
    while (true)   // Loop until game over.
    {
       CMove move = getPlayerMove(board);
+      board.makeMove(move);
+
+      move = ai.getMove();
       board.makeMove(move);
    }
 

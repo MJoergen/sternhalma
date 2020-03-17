@@ -1,5 +1,5 @@
-sternhalma: main.cpp board.cpp
-	g++ main.cpp board.cpp -o $@ -lncurses
+sternhalma: main.cpp board.cpp ai.cpp
+	g++ $^ -o $@ -lncurses
 
 clean:
 	rm -rf sternhalma
