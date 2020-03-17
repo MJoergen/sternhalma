@@ -1,5 +1,7 @@
-sternhalma: main.cpp board.cpp ai.cpp
-	g++ $^ -o $@ -lncurses
+OPTIONS=-DENABLE_TRACE
+
+sternhalma: main.cpp board.cpp ai.cpp trace.cpp
+	g++ $(OPTIONS) $^ -o $@ -lncurses
 
 clean:
 	rm -rf sternhalma

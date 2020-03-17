@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <ostream>
 
 enum EPiece
 {
@@ -20,6 +21,7 @@ class CSquare
       CSquare(const CSquare& rhs) : m_x(rhs.m_x), m_y(rhs.m_y) {}
 
       bool operator == (const CSquare& rhs) const {return m_x == rhs.m_x && m_y == rhs.m_y;}
+      friend std::ostream& operator <<(std::ostream &os, const CSquare &rhs);
       int m_x;
       int m_y;
 }; // class CSquare
@@ -35,6 +37,7 @@ class CMove
 
       bool operator == (const CMove& rhs) const {return m_from == rhs.m_from && m_to == rhs.m_to;}
       bool operator < (const CMove& rhs) const {return m_to.m_y - m_from.m_y < rhs.m_to.m_y - rhs.m_from.m_y;}
+      friend std::ostream& operator <<(std::ostream &os, const CMove &rhs);
 }; // class CMove
 
 
@@ -54,6 +57,7 @@ public:
    void print() const;
    void getMove(CMove &move) const;
    void makeMove(CMove &move);
+   void undoMove(CMove &move);
    bool isMoveLegal(CMove& move) const;
    std::vector<CMove> getLegalMoves(enum EPiece piece) const;
    std::pair<int, int> getScorePair() const;

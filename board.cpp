@@ -2,6 +2,16 @@
 #include <ncurses.h>
 #include "board.h"
 
+std::ostream& operator <<(std::ostream &os, const CSquare &rhs)
+{
+   return os << rhs.m_x << "," << rhs.m_y;
+} // std::ostream& operator <<(std::ostream &os, const CSquare &rhs)
+
+std::ostream& operator <<(std::ostream &os, const CMove &rhs)
+{
+   return os << "(" << rhs.m_from << "->" << rhs.m_to << ") ";
+} // std::ostream& operator <<(std::ostream &os, const CMove &rhs)
+
 static bool isMoveInList(const std::vector<CMove>& moves, const CMove& newMove)
 {
    for (auto move : moves)
@@ -186,6 +196,12 @@ void CBoard::makeMove(CMove& move)
    m_board[move.m_to.m_y][move.m_to.m_x] = m_board[move.m_from.m_y][move.m_from.m_x];
    m_board[move.m_from.m_y][move.m_from.m_x] = P_space;
 } // void CBoard::makeMove(CMove& move)
+
+void CBoard::undoMove(CMove& move)
+{
+   m_board[move.m_from.m_y][move.m_from.m_x] = m_board[move.m_to.m_y][move.m_to.m_x];
+   m_board[move.m_to.m_y][move.m_to.m_x] = P_space;
+} // void CBoard::undoMove(CMove& move)
 
 std::vector<CMove> CBoard::getLegalMoveDestinations(const CSquare& from) const
 {
