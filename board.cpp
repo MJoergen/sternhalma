@@ -121,6 +121,9 @@ void CBoard::print() const
    }
    std::vector<CMove> legalMoves = getLegalMoves(P_X);
    mvprintw(20, 20, "%d legal moves   ", legalMoves.size());
+   std::pair<int, int> scorePair = getScorePair();
+   mvprintw(21, 20, "X:%d O:%d   ", scorePair.first, scorePair.second);
+
 } // void CBoard::print()
 
 
@@ -304,4 +307,33 @@ std::vector<CMove> CBoard::getLegalMoves(enum EPiece piece) const
 
    return legalMoves;
 } // std::vector<CMove> CBoard::getLegalMoves(enum EPiece piece) const
+
+int CBoard::getScore(enum EPiece piece) const
+{
+   int sum = 0;
+   int count = 0;
+   for (int y=0; y<CBoard::CY_SIZE; ++y)
+   {
+      for (int x=0; x<CBoard::CX_SIZE; ++x)
+      {
+         if (m_board[y][x] == piece)
+         {
+            sum += y;
+            count++;
+         }
+      }
+   }
+
+   assert(count == 10);
+
+   return sum;
+} // int CBoard::getScore(enum EPiece piece) const
+
+std::pair<int, int> CBoard::getScorePair() const
+{
+   int scoreX = getScore(EPiece::P_X);
+   int scoreO = getScore(EPiece::P_O);
+
+   return std::make_pair(scoreX-30, 150-scoreO);
+} // std::pair<int, int> CBoard::getScorePair() const
 

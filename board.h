@@ -56,8 +56,10 @@ public:
    void makeMove(CMove &move);
    bool isMoveLegal(CMove& move) const;
    std::vector<CMove> getLegalMoves(enum EPiece piece) const;
+   std::pair<int, int> getScorePair() const;
 
 private:
+   int getScore(enum EPiece piece) const;
    void getSquare(CSquare& sq) const;
    std::vector<CMove> getLegalMoveDestinations(const CSquare& from) const;
    std::vector<CSquare> getLegalJumpDestinations(const CSquare& from) const;
