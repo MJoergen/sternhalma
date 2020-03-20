@@ -136,6 +136,8 @@ class CTrace : public std::ostream
 extern std::ostream *gpTrace;
 
 
+std::string spaces(int numSpaces);
+
 /***************************************************************
  * CTraceFunction
  *
@@ -148,30 +150,32 @@ class CTraceFunction
         CTraceFunction(const CTraceFunction&);
         const CTraceFunction& operator =(const CTraceFunction&);
     public:
-        CTraceFunction(const char *functionName) :
-            functionName(functionName)
+        CTraceFunction(int numSpaces, const char *functionName) :
+            m_numSpaces(numSpaces),
+            m_functionName(functionName)
         {
-            if (gpTrace) {*gpTrace << "+" << functionName << std::endl;}
+            if (gpTrace) {*gpTrace << spaces(m_numSpaces) << "+" << m_functionName << std::endl;}
         }
 
         ~CTraceFunction()
         {
-            if (gpTrace) {*gpTrace << "-" << functionName << std::endl;}
+            if (gpTrace) {*gpTrace << spaces(m_numSpaces) << "-" << m_functionName << std::endl;}
         }
 
     private:
-        const char *functionName;
+        const int m_numSpaces;
+        const char *m_functionName;
 }; /* end of class CTraceFunction */
 
 // These are the three macros supported
-#define TRACE(x) if (gpTrace) {*gpTrace << x;}
-#define TRACE_FUNCTION(x) CTraceFunction temp(x);
+#define TRACE(l,x) if (gpTrace) {*gpTrace << spaces(l) << x;}
+#define TRACE_FUNCTION(l,x) CTraceFunction temp(l,x);
 #define DEBUG(x) x
 
 #else // ENABLE_TRACE
 
-#define TRACE(x)
-#define TRACE_FUNCTION(x)
+#define TRACE(l,x)
+#define TRACE_FUNCTION(l,x)
 #define DEBUG(x)
 
 #endif // ENABLE_TRACE

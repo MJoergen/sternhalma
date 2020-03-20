@@ -1,4 +1,4 @@
-OPTIONS=-DENABLE_TRACE
+OPTIONS=-DENABLE_TRACE -O3
 
 sternhalma: main.cpp board.cpp ai.cpp trace.cpp
 	g++ $(OPTIONS) $^ -o $@ -lncurses

@@ -18,40 +18,14 @@ static CMove getPlayerMove(const CBoard& board)
    return move;
 } // static CMove getPlayerMove(const CBoard& board)
 
-//static CMove getAIMove(const CAI& ai, const CBoard& board)
-//{
-//   CBoard thisBoard(board);
-//
-//   CMove bestMove;
-//   int bestVal = -9999;
-//
-//   std::vector<CMove> moves = thisBoard.getLegalMoves(P_O);
-//   for (auto move : moves)
-//   {
-//      thisBoard.makeMove(move);
-//      int val = -ai.getValue(-9999, 9999, 0);
-//      thisBoard.undoMove(move);
-//
-//      if (val > bestVal)
-//      {
-//         bestVal = val;
-//         bestMove = move;
-//      }
-//   }
-//
-//   return bestMove;
-//} // static CMove getAIMove()
-//
 
 int main(int argc, char **argv)
 {
-   CBoard board;
-
-   CAI ai(board);
-   ai.setMaxDepth(0);
+   // Set default values
+   int maxDepth = 0;
 
    int c;
-   while ((c = getopt(argc, argv, "t:h")) != -1)
+   while ((c = getopt(argc, argv, "t:m:h")) != -1)
    {
       switch (c)
       {
@@ -60,6 +34,7 @@ int main(int argc, char **argv)
 #else
          case 't' : std::cout << "Trace not supported" << std::endl; return 1;
 #endif
+         case 'm' : maxDepth = atoi(optarg); break;
          case 'h' :
          default : {
                       std::cout << "Options:" << std::endl;
@@ -70,13 +45,17 @@ int main(int argc, char **argv)
       }
    }
 
+   CBoard board;
+   CAI ai(board);
+   ai.setMaxDepth(maxDepth);
+
    initscr();
    cbreak();               // Disable line buffering
    keypad(stdscr, TRUE);   // Enable keypad
    noecho();               // Disable keyboard echo
    curs_set(0);            // Disable cursor
 
-   TRACE("Starting trace" << std::endl);
+   TRACE(0, "Starting trace" << std::endl);
 
    CMove move;
    std::pair<int, int> scorePair;

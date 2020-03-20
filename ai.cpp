@@ -4,23 +4,31 @@
 
 const int MAX_VALUE = 999;
 
-int CAI::getValue(int alpha, int beta, int depth)
+int CAI::getValue(int depth)
 {
-   TRACE("alpha=" << alpha << ", beta=" << beta << ", depth=" << depth << " : ");
+   std::pair<int, int> scorePair = m_board.getScorePair();
+
+   int diff = scorePair.first-scorePair.second;
+   int retVal = depth&1 ? diff : -diff;
+   TRACE(3*depth+6, "getValue : " << retVal << std::endl);
+   return retVal;
+} // int CAI::getValue()
+
+
+int CAI::search(int alpha, int beta, int depth)
+{
+   TRACE_FUNCTION(3*depth+3, "search");
+   TRACE(3*depth+3, "alpha=" << alpha << ", beta=" << beta << ", depth=" << depth << std::endl);
+   TRACE(3*depth+3, "");
    for (auto move : m_moveList)
    {
-      TRACE(move);
+      TRACE(0, move);
    }
-
+   TRACE(0, std::endl);
 
    if (depth >= m_maxDepth)
    {
-      std::pair<int, int> scorePair = m_board.getScorePair();
-
-      int diff = scorePair.first-scorePair.second;
-      int retVal = depth&1 ? diff : -diff;
-      TRACE("=> " << retVal << std::endl);
-      return retVal;
+      return getValue(depth);
    }
 
    enum EPiece piece = depth&1 ? P_O : P_X;
@@ -31,7 +39,7 @@ int CAI::getValue(int alpha, int beta, int depth)
    {
       m_moveList.push_back(move);
       m_board.makeMove(move);
-      int val = -getValue(-beta, -alpha, depth+1);
+      int val = -search(-beta, -alpha, depth+1);
       m_board.undoMove(move);
       m_moveList.pop_back();
 
@@ -57,13 +65,15 @@ int CAI::getValue(int alpha, int beta, int depth)
       }
    }
 
-   TRACE("===> " << bestVal << std::endl);
+   TRACE(3*depth+3, "===> " << bestVal << std::endl);
    return bestVal;
 
-} // int CAI::getValue(int alpha, int beta, int depth) const
+} // int CAI::search(int alpha, int beta, int depth) const
 
 CMove CAI::getMove()
 {
+   TRACE_FUNCTION(0, "getMove")
+
    CMove bestMove;
    int bestVal = -MAX_VALUE;
    m_moveList.clear();
@@ -73,7 +83,7 @@ CMove CAI::getMove()
    {
       m_moveList.push_back(move);
       m_board.makeMove(move);
-      int val = -getValue(-MAX_VALUE, MAX_VALUE, 0);
+      int val = -search(-MAX_VALUE, MAX_VALUE, 0);
       m_board.undoMove(move);
       m_moveList.pop_back();
 
@@ -84,6 +94,6 @@ CMove CAI::getMove()
       }
    }
 
-   TRACE("===> " << bestMove << std::endl);
+   TRACE(0, "===> " << bestMove << std::endl);
    return bestMove;
 } // CMove CAI::getMove() const

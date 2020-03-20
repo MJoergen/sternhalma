@@ -13,8 +13,9 @@ public:
    CAI(CBoard& board) : m_board(board), m_maxDepth(0) {}
    void setMaxDepth(int maxDepth) {m_maxDepth=maxDepth;}
 
-   int getValue(int alpha, int beta, int depth);
+   int search(int alpha, int beta, int depth);
    CMove getMove();
+   int getValue(int depth);
 
 private:
 }; // class CAI
